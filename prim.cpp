@@ -4,6 +4,7 @@
 #include <ratio>
 #include <chrono>
 #include <tuple>
+#include <math.h>
 
 using namespace std;
 using namespace std::chrono;
@@ -13,15 +14,14 @@ using namespace std::chrono;
 
 void Prim(int** ,int, int, int*);
 void PintandoRutas(int,int*, int**);
-
+float desvio(vector <int> vector);
 
 
 
 
 int main(){
-int n ;
-cin >> n;
-    if (n != 0){
+	int n ;
+	cin >> n;
     int x;
     int y;
     vector < tuple<int,int> > puntos;
@@ -33,7 +33,7 @@ cin >> n;
     }
 
     for(int i =0; i <n;i++){
-		cout << "(" << get<0>(puntos[i]) << "," << get<1>(puntos[i]) << ")" << " "; 
+		cout << "(" << get<0>(puntos[i]) << "," << get<1>(puntos[i]) << ")" << " ";  // esto es para ver los puntos
 	}
 	cout << endl;
 
@@ -52,71 +52,82 @@ cin >> n;
     }
 
     
-
-
-	for(int i =0; i <n;i++){
+	/*for(int i =0; i <n;i++){
 		for(int j= 0; j<n; j++ ){
 			cout << matriz[i][j] << " "; // esto es para chekear que hay dentro de la matriz
 		}
 	cout << endl;
 	}
-	cout << endl;
+	cout << endl;*/
+
 
     int* Padres = new int[n];
-
-
-    //high_resolution_clock::time_point t1 = high_resolution_clock::now();
-
-    Prim(matriz, 0, n, Padres);
+    Prim(matriz, 0, n, Padres); // AGM
 
 
      for(int i =0; i <n;i++){
-		cout << Padres[i] << " "; 
+		cout << Padres[i] << " ";  // esto es para ver quienes quedaron en el AGM
 	}
 	cout << endl;
-    
-    //PintandoRutas(cantFabricas, Padres, Aristas);
-    //high_resolution_clock::time_point t4 = high_resolution_clock::now();
-    //duration<double> time_span1 = duration_cast<duration<double>>(t4 - t1);
-    //cout << time_span1.count() << endl; 
-	}
 
-/*
-    int res = 0;
-    int contador = 0;
-    i = 0;
-    while(i < cantNodos){
-        if(Padres[i] != -1){
-            res += Aristas[i][Padres[i]];
-            contador++;
+
+
+    // encontrar las aristas cercanas con d = 2
+    //sacarles el promedio al peso y eso es la esperanza
+
+    vector <tuple<int,int>> candidatos;
+
+    for(int a = 0; a < n; a++){
+        int b = Padres[a];
+        int PesoDeAristaAAnalizar = matriz[a][b];
+        //int cercanas = 1;
+
+        vector <int> adyacentesAa;
+        for(int j =0; j <n;j++){
+            if (Padres[j] == a) adyacentesAa.push_back(j);
         }
-        i++;
-    }
-
-    cout << res << " " << contador << " ";
-    i = 0;
-    while(i < cantNodos){
-        if(Padres[i] != -1){
-            cout << Padres[i] << " " << i << " ";
+        
+        float esperanzaA = 0;
+        for(int j =0; j < adyacentesAa.size();j++){
+            esperanzaA = esperanzaA + matriz[a][adyacentesAa[j]];
         }
-        i++;
-    }
-    cout << endl;
-    i = 0;
-    while(i < cantNodos){
-        delete[] Aristas[i];
-        i++;
+
     }
 
-    delete[] matriz;
-    delete[] Padres;
+        vector <int> lista;
+        lista.push_back(21);
+        lista.push_back(22);
+        lista.push_back(19);
+        lista.push_back(15);
 
-cin >> aux;
-}*/
+     	for(int i =0; i < lista.size() ;i++){
+			cout << lista[i] << " ";  // esto es para ver quienes quedaron en el AGM
+		}
+		cout << endl;	
+        cout << desvio( lista) << endl;
+
+
+    //delete[] matriz;
+    //delete[] Padres;
     return 0;
 }
 
 
+float desvio(vector <int> vector){
+	float suma;
+	int n = vector.size();
+	cout << n << endl;
+	for(int i = 0; i < n; i++){
+		suma = suma + vector[i];
+	}
+	float promedio = suma/n;
+	cout << promedio << endl;
+	float sigma;
+	for(int i = 0; i < n; i++){
+		sigma = sigma + ((vector[i] - promedio)*(vector[i] - promedio));
+	}
+	return sqrt(sigma/(n-1));
+}
 
 
 void Prim (int** matriz, int nodo, int cantNodos, int *Padres){
