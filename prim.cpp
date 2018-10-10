@@ -5,6 +5,8 @@
 #include <chrono>
 #include <tuple>
 #include <math.h>
+#include <queue>
+
 
 using namespace std;
 using namespace std::chrono;
@@ -15,7 +17,9 @@ using namespace std::chrono;
 void Prim(int** ,int, int, int*);
 void PintandoRutas(int,int*, int**);
 float desvio(vector <int> vector);
-
+vector <int> calcAdyacentesA(int nodoInicial, int d, int* padres, int **matriz, int n);
+vector <int> calcAdyacentesB(int nodoInicial, int a, int d, int* padres, int **matriz, int n);
+float promedio(vector <int> vector);
 
 
 
@@ -52,81 +56,216 @@ int main(){
     }
 
     
-	/*for(int i =0; i <n;i++){
+	for(int i =0; i <n;i++){
 		for(int j= 0; j<n; j++ ){
 			cout << matriz[i][j] << " "; // esto es para chekear que hay dentro de la matriz
 		}
 	cout << endl;
 	}
-	cout << endl;*/
+	cout << endl;
 
 
-    int* Padres = new int[n];
-    Prim(matriz, 0, n, Padres); // AGM
+    int* padres = new int[n];
+    Prim(matriz, 0, n, padres); // AGM
 
 
      for(int i =0; i <n;i++){
-		cout << Padres[i] << " ";  // esto es para ver quienes quedaron en el AGM
+		cout << padres[i] << " ";  // esto es para ver quienes quedaron en el AGM // 0 0 1 6 6 3 2 2 5 4
+	}
+	cout << endl;
+
+	vector <tuple<int,int>> aristas;
+	for(int i = 0; i < n; i++){
+		if(i != padres[i]) aristas.push_back(make_tuple(i,padres[i]));
+	}
+
+
+
+
+
+	vector <bool> inconsistentes(aristas.size(),0);
+    vector <tuple<int,int>> candidatos;
+    int d = 2;
+
+    for(int p = 0; p < aristas.size(); p++){
+        int a = (int)get<0>(aristas[p]);
+        int b = (int)get<1>(aristas[p]);
+
+        int PesoDeAristaAAnalizar = matriz[a][b];
+
+        vector <int> adyA = calcAdyacentesA(a,2,padres,matriz,n);
+        vector <int> adyB = calcAdyacentesB(b,a,2,padres,matriz,n);
+
+        float promA = promedio(adyA);
+        float promB = promedio(adyB);
+
+       	//inconsistentes[p] = (((PesoDeAristaAAnalizar / promA) > 2*desvio(adyA))  && ((PesoDeAristaAAnalizar / promB) > 2*desvio(adyB))) ? 1 : 0;
+       	inconsistentes[p] = (((PesoDeAristaAAnalizar / promA) > 1)  && ((PesoDeAristaAAnalizar / promB) > 1)) ? 1 : 0;
+
+	}
+
+
+	for(int i =0; i < inconsistentes.size();i++){
+		cout << inconsistentes[i] << " ";  // esto es para ver quienes quedaron en el AGM // 0 0 1 6 6 3 2 2 5 4
 	}
 	cout << endl;
 
 
-
-    // encontrar las aristas cercanas con d = 2
-    //sacarles el promedio al peso y eso es la esperanza
-
-    vector <tuple<int,int>> candidatos;
-
-    for(int a = 0; a < n; a++){
-        int b = Padres[a];
-        int PesoDeAristaAAnalizar = matriz[a][b];
-        //int cercanas = 1;
-
-        vector <int> adyacentesAa;
-        for(int j =0; j <n;j++){
-            if (Padres[j] == a) adyacentesAa.push_back(j);
-        }
-        
-        float esperanzaA = 0;
-        for(int j =0; j < adyacentesAa.size();j++){
-            esperanzaA = esperanzaA + matriz[a][adyacentesAa[j]];
-        }
-
-    }
-
-        vector <int> lista;
-        lista.push_back(21);
-        lista.push_back(22);
-        lista.push_back(19);
-        lista.push_back(15);
-
-     	for(int i =0; i < lista.size() ;i++){
-			cout << lista[i] << " ";  // esto es para ver quienes quedaron en el AGM
-		}
-		cout << endl;	
-        cout << desvio( lista) << endl;
-
-
     //delete[] matriz;
-    //delete[] Padres;
+    //delete[] padres;
     return 0;
 }
+
+
+vector<int> clusterizar(vector <int> inconsistentes, int* padres, int **matriz, int n){
+
+	vector <int> resultado;
+	for(int i =0; incosistentes[i] == 1 && i < inconsistentes.size();i++){
+		padres[(int)get<0>(aristas[i])] = (int)get<0>(aristas[i]);
+	} //cortamos las insconsistentes
+
+	int contador = 0;
+	for(int i =0; i < n;i++){
+		resultado.push_back(contador);
+
+		for(int j =0; j < n;j++){
+			if (padres[j] == (int)get<0>(nodo) && j != (int)get<0>(nodo)){
+			    if((int)get<1>(nodo) + 1 <= d) {
+			        cola.push(make_tuple(j, (int)get<1>(nodo) + 1));
+			        aux.push_back(matriz[(int)get<0>(nodo)][j]);
+			    }
+			}
+
+		}
+
+
+
+	}
+}
+
+
+
+
+vector <int> calcAdyacentesA(int nodoInicial, int d, int* padres, int **matriz, int n){
+
+		queue< tuple <int,int>> cola; // nodo, altura
+	 	cola.push(make_tuple(nodoInicial,0));
+	 	vector <int> aux;
+
+	 	while(!cola.empty()){
+
+	 		tuple <int, int> nodo = cola.front();
+			cola.pop();
+
+		    for(int j =0; j < n;j++){
+		        if (padres[j] == (int)get<0>(nodo) && j != (int)get<0>(nodo)){
+		        	if((int)get<1>(nodo) + 1 <= d) {
+		        		cola.push(make_tuple(j, (int)get<1>(nodo) + 1));
+		        		aux.push_back(matriz[(int)get<0>(nodo)][j]);
+		        	}
+		        }
+
+		    }
+		}
+
+		cout << "[" ;
+	  	for(int i =0; i <aux.size();i++){
+			cout << aux[i] << " ";  // pesos adyacentes por d
+		}
+		cout << "]" << endl;
+		return aux;
+}
+
+
+vector <int> calcAdyacentesB(int nodoInicial,int a, int d, int* padres, int **matriz, int n){
+
+
+	 	queue< tuple <int,int>> cola; // nodo, altura
+	 	cola.push(make_tuple(nodoInicial,0));
+	 	vector <int> aux;
+
+	 	while(!cola.empty()){
+
+	 		tuple <int, int> nodo = cola.front();
+			cola.pop();
+
+		    for(int j =0; j < n;j++){
+		        if (padres[j] == (int)get<0>(nodo) && j != a  && j != (int)get<0>(nodo)){
+		        	if((int)get<1>(nodo) + 1 <= d) {
+		        		cola.push(make_tuple(j, (int)get<1>(nodo) + 1));
+		        		aux.push_back(matriz[(int)get<0>(nodo)][j]);
+		        	}
+		        }
+
+		    }
+		}
+
+		queue< tuple <int,int>> cola2; // nodo, altura
+	 	cola2.push(make_tuple(nodoInicial,0));
+
+	 	while(!cola2.empty()){
+
+	 		tuple <int, int> nodo = cola2.front();
+			cola2.pop();
+
+
+		    if((int)get<1>(nodo) + 1 <= d) {
+		       	if (padres[(int)get<0>(nodo)] != (int)get<0>(nodo) ){
+
+			       	cola2.push(make_tuple(padres[(int)get<0>(nodo)], (int)get<1>(nodo) + 1));// agregue el 3
+		        	aux.push_back(matriz[(int)get<0>(nodo)][padres[(int)get<0>(nodo)]]);
+			        //cout << "agregue a la cola1 al " << padres[(int)get<0>(nodo)] << "," << (int)get<1>(nodo) + 1 << endl;
+
+
+					for(int j =0; j < n;j++){
+			        	if (padres[j] == padres[(int)get<0>(nodo)] && j != (int)get<0>(nodo) && j != padres[(int)get<0>(nodo)]){
+			        		if((int)get<1>(nodo) + 1 <= d) {
+			        			cola2.push(make_tuple(j, (int)get<1>(nodo) + 2));
+			        			//cout << "agregue a la cola2 al " << j << "," << padres[(int)get<1>(nodo)] + 1 << endl;
+			        			aux.push_back(matriz[j][padres[j]]);
+			        		}
+			        	}
+			        }
+			    }
+		    }
+
+
+
+
+	    }
+	
+		cout << "[" ;
+	  	for(int i =0; i <aux.size();i++){
+			cout << aux[i] << " ";  // pesos adyacentes por d
+		}
+		cout << "]" << endl;
+		return aux;
+}
+
 
 
 float desvio(vector <int> vector){
 	float suma;
 	int n = vector.size();
-	cout << n << endl;
 	for(int i = 0; i < n; i++){
 		suma = suma + vector[i];
 	}
 	float promedio = suma/n;
-	cout << promedio << endl;
 	float sigma;
 	for(int i = 0; i < n; i++){
 		sigma = sigma + ((vector[i] - promedio)*(vector[i] - promedio));
 	}
-	return sqrt(sigma/(n-1));
+	return sqrt(sigma/(n));
+}
+
+float promedio(vector <int> vector){
+	float suma;
+	int n = vector.size();
+	for(int i = 0; i < n; i++){
+		suma = suma + vector[i];
+	}
+	float promedio = suma/n;
+	return promedio;
 }
 
 
@@ -186,3 +325,4 @@ void Prim (int** matriz, int nodo, int cantNodos, int *Padres){
         i++;
     }
 }
+

@@ -5,6 +5,6 @@ clean:
 	rm tp2prim
 
 test:
-	python generador.py > in
+	#python generador.py > in
 	./tp2prim < in
 
