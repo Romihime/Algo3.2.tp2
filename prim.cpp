@@ -20,6 +20,7 @@ float desvio(vector <int> vector);
 vector <int> calcAdyacentesA(int nodoInicial, int d, int* padres, int **matriz, int n);
 vector <int> calcAdyacentesB(int nodoInicial, int a, int d, int* padres, int **matriz, int n);
 float promedio(vector <int> vector);
+vector<int> clusterizar(vector <bool> inconsistentes, int* padres, int **matriz, vector <tuple<int,int> > aristas, int n);
 
 
 
@@ -101,7 +102,6 @@ int main(){
 
        	//inconsistentes[p] = (((PesoDeAristaAAnalizar / promA) > 2*desvio(adyA))  && ((PesoDeAristaAAnalizar / promB) > 2*desvio(adyB))) ? 1 : 0;
        	inconsistentes[p] = (((PesoDeAristaAAnalizar / promA) > 1)  && ((PesoDeAristaAAnalizar / promB) > 1)) ? 1 : 0;
-
 	}
 
 
@@ -111,36 +111,42 @@ int main(){
 	cout << endl;
 
 
+    vector<int> resultados = clusterizar(inconsistentes, padres, matriz,aristas, n);
+    for(int i =0; i < n;i++){
+    	cout << resultados[i] << endl;
+    }
     //delete[] matriz;
     //delete[] padres;
     return 0;
 }
 
 
-vector<int> clusterizar(vector <int> inconsistentes, int* padres, int **matriz, int n){
+vector<int> clusterizar(vector <bool> inconsistentes, int* padres, int **matriz, vector <tuple<int,int> > aristas, int n){
 
-	vector <int> resultado;
-	for(int i =0; incosistentes[i] == 1 && i < inconsistentes.size();i++){
-		padres[(int)get<0>(aristas[i])] = (int)get<0>(aristas[i]);
+	vector <int> resultado(n,-1);	 
+	for(int i =0; i < inconsistentes.size();i++){
+		if(inconsistentes[i]) padres[(int)get<0>(aristas[i])] = (int)get<0>(aristas[i]);
 	} //cortamos las insconsistentes
+
+
+	for(int i =0; i <n;i++){
+		cout << padres[i] << " ";  // esto es para ver quienes quedaron en el AGM // 0 0 1 6 6 3 2 2 5 4
+	}
+	cout << endl;
 
 	int contador = 0;
 	for(int i =0; i < n;i++){
-		resultado.push_back(contador);
+		if(resultado[i] == -1) resultado[i] = contador;
 
 		for(int j =0; j < n;j++){
-			if (padres[j] == (int)get<0>(nodo) && j != (int)get<0>(nodo)){
-			    if((int)get<1>(nodo) + 1 <= d) {
-			        cola.push(make_tuple(j, (int)get<1>(nodo) + 1));
-			        aux.push_back(matriz[(int)get<0>(nodo)][j]);
-			    }
+			if (padres[j] == i && padres[i] != i){
+					resultado[padres[j]] = resultado[i];
 			}
-
 		}
-
-
-
+	contador++;
 	}
+
+	return resultado;
 }
 
 
