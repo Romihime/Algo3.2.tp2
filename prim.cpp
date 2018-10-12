@@ -15,7 +15,6 @@ using namespace std::chrono;
 
 
 void Prim(int** ,int, int, int*);
-void PintandoRutas(int,int*, int**);
 float desvio(vector <int> vector);
 vector <int> calcAdyacentesA(int nodoInicial, int d, int* padres, int **matriz, int n);
 vector <int> calcAdyacentesB(int nodoInicial, int a, int d, int* padres, int **matriz, int n);
@@ -80,7 +79,10 @@ int main(){
 		if(i != padres[i]) aristas.push_back(make_tuple(i,padres[i]));
 	}
 
-
+	for(int i =0; i <aristas.size();i++){
+		cout << "(" << get<0>(aristas[i]) << "," << get<1>(aristas[i]) << ")" << " ";  // esto es para ver los puntos
+	}
+	cout << endl;
 
 
 
@@ -104,7 +106,7 @@ int main(){
        	inconsistentes[p] = (((PesoDeAristaAAnalizar / promA) > 1)  && ((PesoDeAristaAAnalizar / promB) > 1)) ? 1 : 0;
 	}
 
-
+	cout << "aristas inconsistentes?" << endl;
 	for(int i =0; i < inconsistentes.size();i++){
 		cout << inconsistentes[i] << " ";  // esto es para ver quienes quedaron en el AGM // 0 0 1 6 6 3 2 2 5 4
 	}
@@ -112,6 +114,7 @@ int main(){
 
 
     vector<int> resultados = clusterizar(inconsistentes, padres, matriz,aristas, n);
+    cout << "Resultado" << endl;
     for(int i =0; i < n;i++){
     	cout << resultados[i] << endl;
     }
@@ -128,9 +131,9 @@ vector<int> clusterizar(vector <bool> inconsistentes, int* padres, int **matriz,
 		if(inconsistentes[i]) padres[(int)get<0>(aristas[i])] = (int)get<0>(aristas[i]);
 	} //cortamos las insconsistentes
 
-
+	cout << "padres con aristas cortadas" << endl;
 	for(int i =0; i <n;i++){
-		cout << padres[i] << " ";  // esto es para ver quienes quedaron en el AGM // 0 0 1 6 6 3 2 2 5 4
+		cout << padres[i] << " "; 
 	}
 	cout << endl;
 
@@ -139,8 +142,8 @@ vector<int> clusterizar(vector <bool> inconsistentes, int* padres, int **matriz,
 		if(resultado[i] == -1) resultado[i] = contador;
 
 		for(int j =0; j < n;j++){
-			if (padres[j] == i && padres[i] != i){
-					resultado[padres[j]] = resultado[i];
+			if (padres[j] == i && padres[j] != j){
+				resultado[j] = resultado[i];
 			}
 		}
 	contador++;
@@ -218,10 +221,11 @@ vector <int> calcAdyacentesB(int nodoInicial,int a, int d, int* padres, int **ma
 		    if((int)get<1>(nodo) + 1 <= d) {
 		       	if (padres[(int)get<0>(nodo)] != (int)get<0>(nodo) ){
 
-			       	cola2.push(make_tuple(padres[(int)get<0>(nodo)], (int)get<1>(nodo) + 1));// agregue el 3
-		        	aux.push_back(matriz[(int)get<0>(nodo)][padres[(int)get<0>(nodo)]]);
-			        //cout << "agregue a la cola1 al " << padres[(int)get<0>(nodo)] << "," << (int)get<1>(nodo) + 1 << endl;
-
+			       	if((int)get<1>(nodo) + 1 < d){
+			       		cola2.push(make_tuple(padres[(int)get<0>(nodo)], (int)get<1>(nodo) + 1));// agregue el 3
+		        		aux.push_back(matriz[(int)get<0>(nodo)][padres[(int)get<0>(nodo)]]);
+			        	//cout << "agregue a la cola1 al " << padres[(int)get<0>(nodo)] << "," << (int)get<1>(nodo) + 1 << endl;
+			        }
 
 					for(int j =0; j < n;j++){
 			        	if (padres[j] == padres[(int)get<0>(nodo)] && j != (int)get<0>(nodo) && j != padres[(int)get<0>(nodo)]){
