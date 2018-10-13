@@ -1,9 +1,13 @@
 #include <iostream>
 #include <vector>
-#include <tuple>
-#include <algorithm>
-#include <queue>
+#include <ctime>
+#include <ratio>
 #include <chrono>
+#include <tuple>
+#include <math.h>
+#include <queue>
+#include <algorithm>
+
 
 using namespace std;
 using namespace std::chrono;
@@ -18,73 +22,51 @@ int Master(int*, int, int);
 
 
 int main(){
-int auxBienPeola;
-cin >> auxBienPeola;
-    while( auxBienPeola != 0){
-		int cantNodos;
-		int cantAristas;
-		cantNodos = auxBienPeola;
-		cin >> cantAristas;
+	int n ;
+	cin >> n;
+    int x;
+    int y;
+    vector < pair<int,int> > puntos;
 
-
-		vector< tuple<int,int,int> > Aristas;
-
-		int i = 0;
-		while(i < cantAristas){
-			int nodo1, nodo2, peso;
-			cin >> nodo1;
-			cin >> nodo2;
-			cin >> peso;
-			tuple<int,int,int> arista = make_tuple(nodo1, nodo2, peso);
-			Aristas.push_back(arista);
-			i++;
-		}
-
-		vector< tuple<int,int,int> > res;
-		int res1 = 0;
-		int res2 = 0;
-		int res3 = 0;
-		
-		vector< vector<int> > lista;
-		for(int j = 0; j < cantNodos; j++){
-			vector<int> aux;
-			lista.push_back(aux);
-		}	
-
-		high_resolution_clock::time_point t1 = high_resolution_clock::now();
-
-		res = Kruskal(Aristas, cantNodos);
-
-		for(int i = 0; i < res.size(); i++){
-			int padre = (int)get<0>(res[i]);
-			int hijo = (int)get<1>(res[i]);
-			lista[padre].push_back(hijo);
-			lista[hijo].push_back(padre);
-		}
-
-		int* padres = new int[cantNodos];
-		res1 = BFS(lista,0, cantNodos, padres);
-		res2 = BFS(lista,res1,cantNodos,padres);
-		
-		res3 = Master(padres, res1, res2);
-		
-		int aux = 0;
-		for(int i = 0; i<res.size();i++){
-			aux = aux + get<2>(res[i]);
-		}
-		
-		high_resolution_clock::time_point t2 = high_resolution_clock::now();
-		duration<double> time_span1 = duration_cast<duration<double>>(t2 - t1);
-		//cout << time_span1.count() << endl; 
-
-		cout << aux << " " << res3 << " " <<res.size() << " ";
-
-		for(int i = 0; i<res.size();i++){	
-			cout << get<0>(res[i]) << " " << get<1>(res[i]) << " ";
-		}
-		cout << endl;
-		cin >> auxBienPeola;
+    for(int i = 0; i < n; i++){
+    	cin >> x;
+    	cin >> y;
+    	puntos.push_back(make_pair(x,y));
     }
+
+	cout << "Puntos" << endl;
+    for(int i =0; i <n;i++){
+		cout << "(" << puntos[i].first << "," << puntos[i].second << ")" << " ";  // esto es para ver los puntos
+	}
+	cout << endl;
+
+	//ya cargue la entrada 
+
+	vector< tuple<int,int,int> > aristas;
+
+	for(int i = 0; i < n; i++){
+       for(int j = 0; j < n; j++){
+		tuple<int,int,int> arista = make_tuple(i, j, abs( puntos[i].first - puntos[j].first) + abs(puntos[i].second - puntos[j].second));
+		aristas.push_back(arista);
+        } // calculamos la distancia entre todos los puntos y los colocamos en la matriz
+    }
+
+	vector< tuple<int,int,int> > res;
+	res = Kruskal(aristas, n);
+
+	vector <pair<int,int>> ejesAnalizar;
+	for(int i = 0; i < n; i++){
+		ejesAnalizar.push_back(make_pair(get<0>(aristas[i]),get<1>(aristas[i]))); // Creamos un vector de aristas
+	}	
+
+	cout << "Aristas" << endl;
+	for(int i =0; i <aristas.size();i++){
+		cout << "(" << get<0>(aristas[i]) << "," << get<1>(aristas[i]) << ")" << " ";  // esto es para ver las aristas
+	}
+	cout << endl;
+
+
+
 	return 0;
 }
 
@@ -140,76 +122,3 @@ void Unir(int* padres, int* altura, int x, int y){
 		altura[nodo1] = altura[nodo1] + 1; 
 	}
 }
-
-
-int BFS(vector< vector <int> >& lista, int nodoInicio, int cantNodos, int* padres){
-	queue<int> cola;
-	int visitados[cantNodos];
-	int i =0;
-	int res = 0;
-
-	while(i < cantNodos){
-		visitados[i] = false;
-		i++;
-	}
-
-	cola.push(nodoInicio);
-	visitados[nodoInicio] = true;
-	padres[nodoInicio] = 0;
-
-	while(!cola.empty()){
-		int aux = cola.front();
-		cola.pop();
-		if(cola.empty()){
-			res = aux;
-		}
-		int i = 0;
-		while(i < lista[aux].size()){
-			if(visitados[lista[aux][i]] == false){
-				visitados[lista[aux][i]] = true;
-				cola.push(lista[aux][i]);
-				padres[lista[aux][i]] = aux;
-			}
-			i++;
-		}
-	}
-	return res;
-}
-
-int Master(int* padres, int e1, int e2){
-	int aux = e2;
-	int contador = 1;
-	while (aux != e1){
-		aux = padres[aux];
-		contador++;
-	}
-
-	aux = e2;
-	int i = 1;
-	if(contador%2 == 0){
-		contador = contador/2;
-	}else{
-		contador = (contador+1)/2;
-	}
-	while(i < contador){
-		aux = padres[aux];
-		i++;
-	}
-	return aux;
-}
-
-    © 2018 GitHub, Inc.
-    Terms
-    Privacy
-    Security
-    Status
-    Help
-
-    Contact GitHub
-    Pricing
-    API
-    Training
-    Blog
-    About
-
-Press h to open a hovercard with more details.
