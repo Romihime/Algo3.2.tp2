@@ -9,7 +9,7 @@
 #include <algorithm>
 
 #define INFINITO 21474836 
-
+int cantidadDeNodos;
 
 using namespace std;
 using namespace std::chrono;
@@ -33,6 +33,7 @@ void printMatriz(vector< vector<int> >  matriz);
 int main(){
 	int n ;
 	cin >> n;
+	cantidadDeNodos = n;
     int x;
     int y;
     vector < pair<int,int> > puntos;
@@ -43,8 +44,8 @@ int main(){
     	puntos.push_back(make_pair(x,y));
     }
 
-	cout << "Puntos" << endl;
-    printVectorPuntos(puntos);
+	//cout << "Puntos" << endl;
+    //printVectorPuntos(puntos);
 
 	//ya cargue la entrada 
 
@@ -77,11 +78,11 @@ int main(){
 	cout << "Aristas" << endl;
 	printVectorPuntos(aristas);
 
-	cout << "Pesos" << endl;
+	/*cout << "Pesos" << endl;
 	for(int i =0; i <aristas.size();i++){
 		cout << "(" << matriz[aristas[i].first][aristas[i].second] << ")" << " ";  // esto es para ver el peso de cada arista
 	}
-	cout << endl;
+	cout << endl;*/
 
 	vector <bool> inconsistentes(aristas.size(),0); // Creamos un vector de bools
     int d = 2;
@@ -102,11 +103,11 @@ int main(){
        	inconsistentes[p] = (((PesoDeAristaAAnalizar / promA) > 1)  && ((PesoDeAristaAAnalizar / promB) > 1)) ? 1 : 0; // criterio con fsubt
 	}
 
-	cout << "aristas inconsistentes?" << endl;
+	/*cout << "aristas inconsistentes?" << endl;
 	for(int i =0; i < inconsistentes.size();i++){
 		cout << inconsistentes[i] << " ";  // esto es para ver si hay inconsistentes
 	}
-	cout << endl;
+	cout << endl;*/
 
 
     vector<int> resultados = clusterizar(inconsistentes, padres, matriz,aristas, n);
@@ -138,7 +139,7 @@ void printVectorPuntos(vector < pair<int,int> >  vector){
 }
 
 void printVectorPadres(int*  vector){
-    for(int i =0; i < sizeof(vector);i++){
+    for(int i =0; i < cantidadDeNodos ;i++){
 		cout << vector[i] << " ";  // este vector es el de padres de cada nodo 
 	}
 	cout << endl;
@@ -160,34 +161,34 @@ vector<int> clusterizar(vector <bool> inconsistentes, int* padres, int **matriz,
 
 	cout << endl;
 
-		queue <int> cola; 
-	 	cola.push(0);
-		int contador = 0;
+	queue <int> cola; 
+ 	cola.push(0);
+	int contador = 0;
 
-	 	while(!cola.empty()){
-	 		int nodo = cola.front();
-			cola.pop();
-			if(resultado[nodo] == -1) resultado[nodo] = contador; // ponele un numero al primer nodo, si no lo visite
+ 	while(!cola.empty()){
+ 		int nodo = cola.front();
+		cola.pop();
+		if(resultado[nodo] == -1) resultado[nodo] = contador; // ponele un numero al primer nodo, si no lo visite
 
-		    for(int j =0; j < n;j++){
-				if (padres[j] == nodo && padres[j] != j){
-					resultado[j] = resultado[nodo]; // y a los hijos poneles el mismo
-		        	cola.push(j);
+	    for(int j =0; j < n;j++){
+			if (padres[j] == nodo && padres[j] != j){
+				resultado[j] = resultado[nodo]; // y a los hijos poneles el mismo
+	        	cola.push(j);
+			}
+	    }
+
+	    if (cola.empty()){
+		    int i = 0;
+			while( i < n){
+		    	i++;
+				if (resultado[i] == -1){
+					cola.push(i); // si ya vi toda la componente conexa, busca otra
+					contador++;
+					break;
 				}
-		    }
-
-		    if (cola.empty()){
-			    int i = 0;
-				while( i < n){
-			    	i++;
-					if (resultado[i] == -1){
-						cola.push(i); // si ya vi toda la componente conexa, busca otra
-						contador++;
-						break;
-					}
-				}		
-			}			   
-		}
+			}		
+		}			   
+	}
 	return resultado;
 }
 

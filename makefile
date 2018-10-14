@@ -7,8 +7,8 @@ clean:
 	rm tp2kruskalcomun
 
 test:
-	python generador.py > in
-	#./tp2prim < in
+	#python generador.py > in
+	./tp2prim < in
 	./tp2kruskalcomun < in
 
 
