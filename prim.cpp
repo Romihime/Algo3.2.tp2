@@ -1,29 +1,13 @@
-#include <iostream>
-#include <vector>
-#include <ctime>
-#include <ratio>
-#include <chrono>
-#include <tuple>
-#include <math.h>
-#include <queue>
-#include <algorithm>
+#include "ej1.h"
 
-#define INFINITO 21474836 
+
 int cantidadDeNodos;
 
-using namespace std;
-using namespace std::chrono;
-
 void Prim(int** ,int, int, int*);
-float desvio(vector <int> vector);
 vector <int> calcAdyacentesA(int nodoInicial, int d, int* padres, int **matriz, int n);
 vector <int> calcAdyacentesB(int nodoInicial, int a, int d, int* padres, int **matriz, int n);
-float promedio(vector <int> vector);
-vector<int> clusterizar(vector <bool> inconsistentes, int* padres, int **matriz, vector <pair<int,int> > aristas, int n);
-void printVectorPuntos(vector < pair<int,int> >  vector);
-void printVector(vector < int >  vector);
 void printVectorPadres(int*  vector);
-void printMatriz(vector< vector<int> >  matriz);
+
 
 
 //Parametros a modificar para experimentar:
@@ -75,8 +59,8 @@ int main(){
 		if(i != padres[i]) aristas.push_back(make_pair(i,padres[i])); // Creamos un vector de aristas
 	}
 
-	cout << "Aristas" << endl;
-	printVectorPuntos(aristas);
+	//cout << "Aristas" << endl;
+	//printVectorPuntos(aristas);
 
 	/*cout << "Pesos" << endl;
 	for(int i =0; i <aristas.size();i++){
@@ -110,7 +94,7 @@ int main(){
 	cout << endl;*/
 
 
-    vector<int> resultados = clusterizar(inconsistentes, padres, matriz,aristas, n);
+    vector<int> resultados = clusterizar(inconsistentes, padres, aristas, n);
     cout << "Resultado" << endl;
 	printVector(resultados);
 
@@ -121,78 +105,12 @@ int main(){
 
 
 
-void printMatriz(vector< vector<int> >  matriz){
-    for(int i = 0; i < matriz[0].size(); i++){
-       for(int j = 0; j < matriz[0].size(); j++){
-            cout << matriz[i][j] << " " ;
-        }
-        cout << endl;
-    }
-    cout << endl;
-}
-
-void printVectorPuntos(vector < pair<int,int> >  vector){
-    for(int i =0; i <vector.size();i++){
-		cout << "(" << vector[i].first << "," << vector[i].second << ")" << " ";  // esto es para ver los puntos
-	}
-	cout << endl;
-}
-
 void printVectorPadres(int*  vector){
     for(int i =0; i < cantidadDeNodos ;i++){
 		cout << vector[i] << " ";  // este vector es el de padres de cada nodo 
 	}
 	cout << endl;
 }
-
-void printVector(vector < int >  vector){
-    for(int i =0; i <vector.size();i++){
-		cout << vector[i] << " ";  // este vector es el de padres de cada nodo 
-	}
-	cout << endl;
-}
-
-vector<int> clusterizar(vector <bool> inconsistentes, int* padres, int **matriz, vector <pair<int,int> > aristas, int n){
-
-	vector <int> resultado(n,-1);	 
-	for(int i =0; i < inconsistentes.size();i++){
-		if(inconsistentes[i]) padres[aristas[i].first] = aristas[i].first;
-	} //cortamos las insconsistentes del arreglo de padres
-
-	cout << endl;
-
-	queue <int> cola; 
- 	cola.push(0);
-	int contador = 0;
-
- 	while(!cola.empty()){
- 		int nodo = cola.front();
-		cola.pop();
-		if(resultado[nodo] == -1) resultado[nodo] = contador; // ponele un numero al primer nodo, si no lo visite
-
-	    for(int j =0; j < n;j++){
-			if (padres[j] == nodo && padres[j] != j){
-				resultado[j] = resultado[nodo]; // y a los hijos poneles el mismo
-	        	cola.push(j);
-			}
-	    }
-
-	    if (cola.empty()){
-		    int i = 0;
-			while( i < n){
-		    	i++;
-				if (resultado[i] == -1){
-					cola.push(i); // si ya vi toda la componente conexa, busca otra
-					contador++;
-					break;
-				}
-			}		
-		}			   
-	}
-	return resultado;
-}
-
-
 
 
 vector <int> calcAdyacentesA(int nodoInicial, int d, int* padres, int **matriz, int n){
@@ -280,25 +198,7 @@ vector <int> calcAdyacentesB(int nodoInicial,int a, int d, int* padres, int **ma
 
 
 
-float desvio(vector <int> vector){
-	int n = vector.size();
-	float promedio1 = promedio(vector);
-	float sigma;
-	for(int i = 0; i < n; i++){
-		sigma = sigma + ((vector[i] - promedio1)*(vector[i] - promedio1)); // calculamos el desvio
-	}
-	return sqrt(sigma/(n));
-}
 
-float promedio(vector <int> vector){
-	float suma;
-	int n = vector.size();
-	for(int i = 0; i < n; i++){
-		suma = suma + vector[i];
-	}
-	float promedio = suma/n;
-	return promedio;
-}
 
 
 void Prim (int** matriz, int nodo, int cantNodos, int *res){
