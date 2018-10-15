@@ -3,9 +3,9 @@
 
 int cantidadDeNodos;
 
-void Prim(int** ,int, int, int*);
-vector <int> calcAdyacentesA(int nodoInicial, int d, int* padres, int **matriz, int n);
-vector <int> calcAdyacentesB(int nodoInicial, int a, int d, int* padres, int **matriz, int n);
+void Prim (vector <vector<int>> matriz, int nodo, int cantNodos, int *res);
+vector <int> calcAdyacentesA(int nodoInicial, int d, int* padres, vector <vector<int>> matriz, int n);
+vector <int> calcAdyacentesB(int nodoInicial, int a, int d, int* padres, vector <vector<int>> matriz, int n);
 void printVectorPadres(int*  vector);
 
 
@@ -25,19 +25,15 @@ int main(){
     for(int i = 0; i < n; i++){
     	cin >> x;
     	cin >> y;
-    	puntos.push_back(make_pair(x,y));
+    	puntos.push_back(make_pair(x,y)); 
     }
 
-	//cout << "Puntos" << endl;
-    //printVectorPuntos(puntos);
+	
 
-	//ya cargue la entrada 
+    vector< vector<int> > matriz(n);
 
-    int **matriz;
-    matriz = new int*[n];
-
-    for(int x = 0; x < n; x++){
-        matriz[x] = new int[n];
+    for(int i = 0; i < n; i++){
+        matriz[i].resize(n); // inicializamos la matriz
     }
 
    for(int i = 0; i < n; i++){
@@ -98,7 +94,7 @@ int main(){
     cout << "Resultado" << endl;
 	printVector(resultados);
 
-    delete[] matriz;
+
     delete[] padres;
     return 0;
 }
@@ -113,7 +109,7 @@ void printVectorPadres(int*  vector){
 }
 
 
-vector <int> calcAdyacentesA(int nodoInicial, int d, int* padres, int **matriz, int n){
+vector <int> calcAdyacentesA(int nodoInicial, int d, int* padres, vector <vector<int>> matriz, int n){
 
 		queue< pair <int,int>> cola; // nodo, altura
 	 	cola.push(make_pair(nodoInicial,0));	// coloco en la cola al nodo inicial
@@ -142,7 +138,7 @@ vector <int> calcAdyacentesA(int nodoInicial, int d, int* padres, int **matriz, 
 }
 
 
-vector <int> calcAdyacentesB(int nodoInicial,int a, int d, int* padres, int **matriz, int n){
+vector <int> calcAdyacentesB(int nodoInicial,int a, int d, int* padres, vector <vector<int>> matriz, int n){
 
  	queue< pair <int,int>> cola; // nodo, altura
  	cola.push(make_pair(nodoInicial,0));
@@ -201,7 +197,7 @@ vector <int> calcAdyacentesB(int nodoInicial,int a, int d, int* padres, int **ma
 
 
 
-void Prim (int** matriz, int nodo, int cantNodos, int *res){
+void Prim (vector <vector<int>> matriz, int nodo, int cantNodos, int *res){
     int nodosVisitados = 0;
     bool visitados[cantNodos]; 
     int i = 0;
